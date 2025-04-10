@@ -27,3 +27,15 @@ To install the dependencies, run:
 
 ```bash
 pip install -r requirements.txt
+
+# ABD Model
+
+This repository contains a trained YOLO model for detecting atoms and bonds in handwritten molecular structure images.
+
+## Installation
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/Safi-ullah-majid/ABD-model.git
+   cd ABD-model
+
