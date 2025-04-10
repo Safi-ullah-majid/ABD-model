@@ -39,3 +39,16 @@ This repository contains a trained YOLO model for detecting atoms and bonds in h
    git clone https://github.com/Safi-ullah-majid/ABD-model.git
    cd ABD-model
 
+2.  Install dependencie
+ pip install -r requirements.txt
+3. Download the model file (ABD.pt) and make sure it’s in the correct directory.
+Usage
+To make predictions using the model, run the predict.py script:
+
+bash
+Copy
+Edit
+python predict.py --input_path path/to/image
+Ensure that the model is loaded correctly and that the input image is a valid image file.
+License
+This repository is licensed under the MIT License - see the LICENSE file for details.
