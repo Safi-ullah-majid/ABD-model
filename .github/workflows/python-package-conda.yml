@@ -23,21 +23,31 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         miniconda-version: "latest"
+        activate-environment: test-env
 
-    - name: Create and activate Conda environment
+    - name: Create Conda environment
       run: |
-        conda env create --file environment.yml --name test-env
+        if [ -f "environment.yml" ]; then
+          conda env create -f environment.yml -n test-env
+        else
+          echo "No environment.yml found, creating default environment"
+          conda create -n test-env python=${{ matrix.python-version }} numpy pandas -y
+        fi
+
+    - name: Activate environment and install dependencies
+      run: |
         conda activate test-env
+        conda install --quiet --yes pytest pytest-cov flake8
+        pip install -e .
 
-    - name: Install linting and testing packages
+    - name: List installed packages (debugging)
       run: |
-        conda install --quiet --yes flake8 pytest pytest-cov
+        conda list
+        pip list
 
     - name: Lint with flake8
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Test with pytest
