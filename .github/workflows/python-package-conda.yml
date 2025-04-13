@@ -1,35 +1,40 @@
 name: Python Package using Conda
 
-on: [push]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
 
     - name: Set up Miniconda
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
-        python-version: 3.10
+        python-version: ${{ matrix.python-version }}
+        miniconda-version: "latest"
 
     - name: Create and activate Conda environment
       run: |
-        conda env create --file environment.yml --name myenv
-        conda activate myenv
+        conda env create --file environment.yml --name test-env
+        conda activate test-env
+
+    - name: Install linting and testing packages
+      run: |
+        conda install --quiet --yes flake8 pytest pytest-cov
 
     - name: Lint with flake8
       run: |
-        conda install flake8 -y
         # Stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # Exit-zero treats all errors as warnings
@@ -37,5 +42,8 @@ jobs:
 
     - name: Test with pytest
       run: |
-        conda install pytest -y
-        pytest
+        pytest --cov=./ --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: success()
